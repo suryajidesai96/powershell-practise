@@ -33,6 +33,7 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 #>
+#Requires -Module @{ ModuleName = 'Az'; ModuleVersion = '4.2' }
 
 [CmdletBinding()]
 param (
@@ -92,12 +93,13 @@ $ARGS = @{
 $ErrorActionPreference = "Stop"
 if ($Test) {
     Test-AzResourceGroupDeployment @ARGS
-    exit 1
+    exit $LASTEXITCODE
 }
 if ($WhatIf) {
-    $WhatIfResult = Get-AzResourceGroupDeploymentWhatIfResult @ARGS -ResultFormat FullResourcePayloads
+    $WhatIfResult = Get-AzResourceGroupDeploymentWhatIfResult @ARGS `
+                                    -ResultFormat FullResourcePayloads
     $WhatIfResult
-    exit 1
+    exit $LASTEXITCODE
 }
 #endregion
 
@@ -106,13 +108,13 @@ try {
     $PromptForConfirmation = (($Force) ? $false : $true)
     Write-Host "Deploying $Region"
     $Deployment = New-AzResourceGroupDeployment @ARGS `
-        -Name "$(New-Guid)" `
-        -Confirm:$PromptForConfirmation `
-        -WhatIfResultFormat FullResourcePayloads
+                                                -Name "$(New-Guid)" `
+                                                -Confirm:$PromptForConfirmation `
+                                                -WhatIfResultFormat FullResourcePayloads
 }
 catch {
     Write-Host $_.Exception.Message
-    exit 1
+    exit $LASTEXITCODE
 }
 
 # Tell me If my Deployment was Successfull
