@@ -1,3 +1,39 @@
+<#
+    .DESCRIPTION
+    Tests, Validates or Deploys Azure Resource Manager Template
+
+    .PARAMETER Test
+    Switch for only running the Offline Template Validation
+
+    .PARAMETER WhatIf
+    Switch for only running the What-If Validation, that simulates a deployment via the Azure ARM REST API
+
+    .PARAMETER Force
+    Switch for skipping the Confirmation Prompt for Deployment
+    .NOTES
+    MIT License
+
+    Copyright (c) 2020 Mert Senel
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+#>
+
 [CmdletBinding()]
 param (
     [Parameter()][switch]$WhatIf,
@@ -6,7 +42,9 @@ param (
 )
 #region Configuration
 #Deployment Assets Configuration
-$OperationsPath = Split-Path $PSScriptRoot   # Go Up one level so you can pick a project, this is there in case you want to keep your script in different folder.
+# Go Up one level so you can pick a project
+# This is here in case you want to keep your script in different folder.
+$OperationsPath = Split-Path $PSScriptRoot 
 $ArmArtifactsPath = "$OperationsPath\infrastructure" # Target the folder which desired ARM Template and Parameter files are in. 
 
 #Azure Environment Configuration
@@ -35,6 +73,7 @@ $ServiceType = 'fnc'
 $Region = "wus"
 #endregion
 
+#region Service Curated Parameters
 $ResourceGroupName = $ProjectName + $Stage + $ServiceType + $Region + '01'
 $TemplateFile = "$ArmArtifactsPath\template.json"
 $TemplateParameterFile = "$ArmArtifactsPath\parameters.$Stage.$($Region)01.json"
