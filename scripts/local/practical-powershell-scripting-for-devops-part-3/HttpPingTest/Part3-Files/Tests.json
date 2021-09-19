@@ -1,0 +1,73 @@
+[{
+        "name": "FlakyWebsite-#1",
+        "url": "https://httpbin.org/status/200,403,404,500"
+    },
+    {
+        "name": "StableWebsite-#1",
+        "url": "https://httpbin.org/status/200"
+    },
+    {
+        "name": "FlakyWebsite-#2",
+        "url": "https://httpbin.org/status/200,403,404,500"
+    },
+    {
+        "name": "StableWebsite-#2",
+        "url": "https://httpbin.org/status/200"
+    },
+    {
+        "name": "StableWebsite-#3",
+        "url": "https://httpbin.org/status/200"
+    },
+    {
+        "name": "StableWebsite-#4",
+        "url": "https://httpbin.org/status/200"
+    },
+    {
+        "name": "FlakyWebsite-#3",
+        "url": "https://httpbin.org/status/200,403,404,500"
+    },
+    {
+        "name": "FlakyWebsite-#4",
+        "url": "https://httpbin.org/status/200,403,404,500"
+    },
+    {
+        "name": "FaultyWebsite-#1",
+        "url": "https://httpbin.org/status/500"
+    },
+    {
+        "name": "FlakyWebsite-#1",
+        "url": "https://httpbin.org/status/200,403,404,500"
+    },
+    {
+        "name": "StableWebsite-#1",
+        "url": "https://httpbin.org/status/200"
+    },
+    {
+        "name": "FlakyWebsite-#2",
+        "url": "https://httpbin.org/status/200,403,404,500"
+    },
+    {
+        "name": "StableWebsite-#2",
+        "url": "https://httpbin.org/status/200"
+    },
+    {
+        "name": "StableWebsite-#3",
+        "url": "https://httpbin.org/status/200"
+    },
+    {
+        "name": "StableWebsite-#4",
+        "url": "https://httpbin.org/status/200"
+    },
+    {
+        "name": "FlakyWebsite-#3",
+        "url": "https://httpbin.org/status/200,403,404,500"
+    },
+    {
+        "name": "FlakyWebsite-#4",
+        "url": "https://httpbin.org/status/200,403,404,500"
+    },
+    {
+        "name": "FaultyWebsite-#1",
+        "url": "https://httpbin.org/status/500"
+    }
+]
