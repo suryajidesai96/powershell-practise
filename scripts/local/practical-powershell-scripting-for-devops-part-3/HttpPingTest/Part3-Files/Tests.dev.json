@@ -1,9 +1,0 @@
-[{
-        "name": "FlakyWebsite-#1",
-        "url": "https://httpbin.org/status/200,403,404,500"
-    },
-    {
-        "name": "StableWebsite-#1",
-        "url": "https://httpbin.org/status/200"
-    }
-]
