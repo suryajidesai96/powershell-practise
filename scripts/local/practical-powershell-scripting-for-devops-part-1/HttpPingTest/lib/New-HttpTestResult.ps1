@@ -1,24 +1,27 @@
-function New-HttpTestResult {
-    param (
-        [Parameter(ValueFromPipeline=$true)]
-        [PSCustomObject]
-        $TestArgs
-    )
-    $ProgressPreference = 'SilentlyContinue'
+#!/bin/bash
 
-    $Method = 'Get'
+New_HttpTestResult() {
+    url=$1
+    name=$2
 
-    $duration = Measure-Command {
-        $Response = Invoke-WebRequest -Uri $TestArgs.url -Method $Method -SkipHttpErrorCheck
-    }
+    method="GET"
 
-    $result = [PSCustomObject]@{
-        name = $TestArgs.name
-        status_code = $Response.StatusCode.ToString()
-        status_description = $Response.StatusDescription
-        responsetime_ms = $duration.Milliseconds
-        timestamp = (get-date).ToString('O')
-    }
+    start_time=$(date +%s%N)
+    response=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+    end_time=$(date +%s%N)
 
-    return $result
+    duration=$((($end_time - $start_time) / 1000000))
+
+    timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+    result="{\"name\":\"$name\",\"status_code\":\"$response\",\"responsetime_ms\":\"$duration\",\"timestamp\":\"$timestamp\"}"
+
+    echo "$result"
 }
+
+# Example usage:
+url="https://example.com"
+name="TestName"
+result=$(New_HttpTestResult "$url" "$name")
+
+echo "Result: $result"
