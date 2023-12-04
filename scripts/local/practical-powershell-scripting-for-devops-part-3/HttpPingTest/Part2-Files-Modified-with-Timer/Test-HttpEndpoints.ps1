@@ -1,32 +1,46 @@
-[CmdletBinding()]
-param (
-    [Parameter(ValueFromPipeline = $true)]
-    [string]
-    $TestsFilePath =  '.\Tests.json'
-)
+#!/bin/bash
 
-#Lets Create a StopWatch Object.
-$Stopwatch = [System.Diagnostics.Stopwatch]::new()
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    key="$1"
 
-# Now Start the timer.
-$Stopwatch.Start()
+    case $key in
+        -TestsFilePath)
+        TestsFilePath="$2"
+        shift # past argument
+        shift # past value
+        ;;
+        *)
+        # unknown option
+        shift
+        ;;
+    esac
+done
 
-# Convert JSON Config Files String value to a PowerShell Object
-$TestsObj = Get-Content -Path $TestsFilePath | ConvertFrom-Json
+# Set default value if TestsFilePath is not provided
+TestsFilePath=${TestsFilePath:-"./Tests.json"}
+
+# Create a Stopwatch Object
+start_time=$(date +%s.%N)
+
+# Convert JSON Config Files String value to a JSON object
+TestsObj=$(jq '.' "$TestsFilePath")
 
 # Import the Tester Function
-. ./lib/New-HttpTestResult.ps1
+source ./lib/New-HttpTestResult.sh
 
 # Loop through Test Objects and get the results as a collection
-$TestResults = foreach ($Test in $TestsObj) { 
-    New-HttpTestResult -TestArgs $Test 
-}
+TestResults=""
+while IFS= read -r Test; do
+    TestResults+="$(New_HttpTestResult "$Test")"$'\n'
+done <<< "$TestsObj"
 
-$TestResults | Format-Table -AutoSize
+echo "$TestResults" | column -t
 
-# Now Stop the timer.
-$Stopwatch.Stop()
+# Stop the Stopwatch
+end_time=$(date +%s.%N)
 
-$TestDuration  =  $Stopwatch.Elapsed.TotalSeconds
+# Calculate the elapsed time
+elapsed_time=$(echo "$end_time - $start_time" | bc)
 
-Write-Host "Total Script Execution Time: $($TestDuration) Seconds"
+echo "Total Script Execution Time: $elapsed_time Seconds"
