@@ -1,46 +1,40 @@
-function New-HttpTestResult {
-    param (
-        [Parameter(ValueFromPipeline = $true)]
-        [PSCustomObject]
-        $TestArgs,
-        # Maximum Retry Amount
-        [Parameter()][int]$MaxRetryNo = 10,
-        # Time to wait in between retry attempts
-        [Parameter()][int]$WaitTimeInSeconds = 1
-    )
-    $ProgressPreference = 'SilentlyContinue'
+#!/bin/bash
 
-    $Method = 'Get'
+New_HttpTestResult() {
+    url=$1
+    name=$2
+    MaxRetryNo=${3:-10}  # Default to 10 if not provided
+    WaitTimeInSeconds=${4:-1}  # Default to 1 second if not provided
 
-    $TestCounter = 0 
+    Method="GET"
+    TestCounter=0
 
-    # -lt: Lower Than 
-    while ($TestCounter -lt $MaxRetryNo) {
-        
-        #Increment our counter by 1 before we make our first attempt
-        $TestCounter++
-        $duration = Measure-Command {
-            $Response = Invoke-WebRequest -Uri $TestArgs.url -Method $Method -SkipHttpErrorCheck
-        }
+    while [ $TestCounter -lt $MaxRetryNo ]; do
+        ((TestCounter++))
 
-        # If we find the 200 code we stop polling
-        if($Response.StatusCode.ToString() -eq '200'){
-            break;
-        }
-        else {
-            #Else we need to wait for configured amount of time
-            Start-Sleep -Seconds $WaitTimeInSeconds
-        }
-    }
+        start_time=$(date +%s%N)
+        response=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+        end_time=$(date +%s%N)
 
-    $result = [PSCustomObject]@{
-        name               = $TestArgs.name
-        status_code        = $Response.StatusCode.ToString()
-        status_description = $Response.StatusDescription
-        attempt_no         = "$($TestCounter)/$($MaxRetryNo)"
-        responsetime_ms    = $duration.Milliseconds
-        timestamp          = (get-date).ToString('O')
-    }
+        duration=$((($end_time - $start_time) / 1000000))
 
-    return $result 
+        if [ "$response" -eq 200 ]; then
+            break
+        else
+            sleep $WaitTimeInSeconds
+        fi
+    done
+
+    timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+    result="{\"name\":\"$name\",\"status_code\":\"$response\",\"status_description\":\"\",\"attempt_no\":\"$TestCounter/$MaxRetryNo\",\"responsetime_ms\":\"$duration\",\"timestamp\":\"$timestamp\"}"
+
+    echo "$result"
 }
+
+# Example usage:
+url="https://example.com"
+name="TestName"
+result=$(New_HttpTestResult "$url" "$name")
+
+echo "Result: $result"
