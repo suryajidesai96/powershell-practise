@@ -1,19 +1,27 @@
-[CmdletBinding()]
-param (
-    [Parameter(ValueFromPipeline = $true)]
-    [string]
-    $TestsFilePath =  '.\Tests.json'
-)
+#!/bin/bash
 
-# Convert JSON Config Files String value to a PowerShell Object
-$TestsObj = Get-Content -Path $TestsFilePath | ConvertFrom-Json
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    key="$1"
+
+    case $key in
+        -TestsFilePath)
+        TestsFilePath="$2"
+        shift # past argument
+        shift # past value
+        ;;
+        *)
+        # unknown option
+        shift
+        ;;
+    esac
+done
+
+# Set default value if TestsFilePath is not provided
+TestsFilePath=${TestsFilePath:-"./Tests.json"}
+
+# Convert JSON Config Files String value to a JSON object
+TestsObj=$(jq '.' "$TestsFilePath")
 
 # Import the Tester Function
-. ./lib/New-HttpTestResult.ps1
-
-# Loop through Test Objects and get the results as a collection
-$TestResults = foreach ($Test in $TestsObj) { 
-    New-HttpTestResult -TestArgs $Test 
-}
-
-$TestResults | Format-Table -AutoSize
+source ./lib/New-HttpTestResult.sh
